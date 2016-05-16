@@ -75,4 +75,34 @@ public class Customer {
     private String toDollars(double d){
         return String.format("$%,.2f", abs(d));
     }
+	
+    public boolean transfer(int fromAccountType, int toAccountType, double amount) {
+    	boolean isTransferSucess = false;
+		if (amount <= 0) {
+			throw new IllegalArgumentException("amount must be greater than zero");
+		} else {
+			for (Account fromAccount : accounts) {
+				if (fromAccount.getAccountType() == fromAccountType) {
+					fromAccount.withdraw(amount);
+				}
+			}
+			for (Account toAccount : accounts) {
+				if (toAccount.getAccountType() == toAccountType) {
+					toAccount.deposit(amount);
+				}
+			}
+			isTransferSucess = true;
+		}
+		return isTransferSucess;
+	}
+
+	public Account getAccount(int accountType) {
+		for (Account account : accounts) {
+			if (account.getAccountType() == accountType) {
+				return account;
+			}
+		}
+		return null;
+	}
+
 }
