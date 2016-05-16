@@ -7,6 +7,8 @@ import static org.junit.Assert.assertEquals;
 
 public class CustomerTest {
 
+	private static final double DOUBLE_DELTA = 1e-15;
+	
     @Test //Test customer statement generation
     public void testApp(){
 
@@ -47,11 +49,48 @@ public class CustomerTest {
         assertEquals(2, oscar.getNumberOfAccounts());
     }
 
-    @Ignore
+    @Test
     public void testThreeAcounts() {
         Customer oscar = new Customer("Oscar")
                 .openAccount(new Account(Account.SAVINGS));
         oscar.openAccount(new Account(Account.CHECKING));
+        oscar.openAccount(new Account(Account.MAXI_SAVINGS));
         assertEquals(3, oscar.getNumberOfAccounts());
     }
+    
+    @Test
+	public void testTransfer() {
+
+		Customer oscar = new Customer("Oscar").openAccount(new Account(Account.SAVINGS));
+		oscar.openAccount(new Account(Account.CHECKING));
+		oscar.openAccount(new Account(Account.MAXI_SAVINGS));
+
+		Account savingsAccont = oscar.getAccount(Account.SAVINGS);
+		savingsAccont.deposit(400);
+
+		Account checkingAccont = oscar.getAccount(Account.CHECKING);
+		checkingAccont.deposit(500);
+
+		Account maxSavingsAccont = oscar.getAccount(Account.MAXI_SAVINGS);
+		maxSavingsAccont.deposit(600);
+
+		// transfer from savingsAccont to checkingAccont
+		oscar.transfer(Account.SAVINGS, Account.CHECKING, 50);
+		assertEquals(350, savingsAccont.getTotalAmount(), DOUBLE_DELTA);
+		assertEquals(550, checkingAccont.getTotalAmount(), DOUBLE_DELTA);
+
+		// transfer from checkingAccont to maxSavingsAccont
+		oscar.transfer(Account.CHECKING, Account.MAXI_SAVINGS, 80);
+		assertEquals(470, checkingAccont.getTotalAmount(), DOUBLE_DELTA);
+		assertEquals(680, maxSavingsAccont.getTotalAmount(), DOUBLE_DELTA);
+
+		// transfer from maxSavingsAccont to savingsAccont
+		oscar.transfer(Account.MAXI_SAVINGS, Account.SAVINGS, 40);
+
+		assertEquals(640, maxSavingsAccont.getTotalAmount(), DOUBLE_DELTA);
+		assertEquals(390, savingsAccont.getTotalAmount(), DOUBLE_DELTA);
+
+		// oscar.get
+
+	}
 }
